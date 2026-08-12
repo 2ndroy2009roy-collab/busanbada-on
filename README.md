@@ -44,6 +44,17 @@ npm run dev
 
 터미널이 안내하는 주소(대개 `http://localhost:3000`)를 브라우저에서 여세요.
 
+## GitHub Pages 공개 배포
+
+GitHub Pages는 `gh-pages` 브랜치의 정적 빌드를 공개합니다.
+
+1. Kakao Developers의 **Web 플랫폼**에 `https://2ndroy2009roy-collab.github.io`를 등록합니다.
+2. `NEXT_PUBLIC_KAKAO_MAP_KEY`가 설정된 환경에서 `npm run build:pages`를 실행합니다.
+3. 생성된 `gh-pages-dist` 폴더를 `gh-pages` 브랜치의 루트에 올립니다.
+4. `https://2ndroy2009roy-collab.github.io/busanbada-on/`에서 공개 사이트를 확인합니다.
+
+Kakao Maps JavaScript 키는 브라우저에서 사용하는 공개 키입니다. 키를 소스 코드나 `.env.example`에 직접 저장하지 마세요.
+
 ## 지도 사용법
 
 - 추천 카드의 **시설 보기** 또는 하단 **지도** 메뉴를 누르면 추천 해수욕장 중심의 지도가 열립니다.
