@@ -6,6 +6,14 @@
 
 지도 화면은 Kakao Maps JavaScript API와 `services` 라이브러리를 사용합니다. 주변 음식점·카페·편의점·주차장은 카테고리 검색으로, 화장실은 해수욕장 주변 키워드 검색과 부산바다ON 자체 시설 데이터로 표시합니다.
 
+### API 어댑터와 응답 형식
+
+지도 장소 검색은 [Kakao Maps JavaScript SDK Places 문서](https://apis.map.kakao.com/web/documentation/#KeywordSearch)와 [Kakao Local API 장소 응답 문서](https://developers.kakao.com/docs/latest/ko/local/dev-guide)를 확인해 구현했습니다. `app/lib/kakaoPlacesAdapter.ts`가 SDK의 공식 장소 응답 필드(`place_name`, `category_name`, `phone`, `address_name`, `road_address_name`, `x`, `y`, `place_url`, `distance`)를 앱에서 쓰는 시설 형식으로 변환합니다.
+
+- 공식 카테고리 코드: 음식점 `FD6`, 카페 `CE7`, 편의점 `CS2`, 주차장 `PK6`
+- 반경: 선택한 해수욕장 중심 1,300m (공식 SDK의 `location`·`radius` 옵션 사용)
+- 해양·날씨·혼잡도는 공식 실시간 데이터 연동 문서와 키가 아직 제공되지 않았으므로 **예시 데이터**를 유지합니다. 임의의 API URL·키·응답 형식은 사용하지 않습니다.
+
 ### 1. Kakao Developers에서 애플리케이션 생성
 
 1. [Kakao Developers](https://developers.kakao.com)에 로그인합니다.
