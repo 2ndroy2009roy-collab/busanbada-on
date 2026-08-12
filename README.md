@@ -1,100 +1,52 @@
-# vinext-starter
+# 부산바다ON
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+여행 취향과 해수욕장 상태를 바탕으로 부산 바다와 하루 코스를 추천하는 모바일 웹앱입니다.
 
-## Prerequisites
+## Kakao Maps 연결하기
 
-- Node.js `>=22.13.0`
+지도 화면은 Kakao Maps JavaScript API와 `services` 라이브러리를 사용합니다. 주변 음식점·카페·편의점·주차장은 카테고리 검색으로, 화장실은 해수욕장 주변 키워드 검색과 부산바다ON 자체 시설 데이터로 표시합니다.
 
-## Quick Start
+### 1. Kakao Developers에서 애플리케이션 생성
+
+1. [Kakao Developers](https://developers.kakao.com)에 로그인합니다.
+2. **내 애플리케이션 → 애플리케이션 추가하기**를 선택합니다.
+3. 앱 이름을 입력해 앱을 만듭니다.
+
+### 2. JavaScript 키 확인 및 지도 사용 설정
+
+1. 생성한 앱의 **앱 설정 → 앱 키**에서 **JavaScript 키**를 복사합니다.
+2. **제품 설정 → 지도**에서 Kakao Maps 사용 설정을 켭니다.
+
+### 3. Web 플랫폼 도메인 등록
+
+1. **앱 설정 → 플랫폼 → Web 플랫폼 등록**으로 이동합니다.
+2. 개발 중에는 `http://localhost:3000`을 등록합니다.
+3. 배포한 뒤에는 실제 서비스 주소도 등록합니다. 예: `https://your-domain.com`
+
+### 4. 환경변수 만들기
+
+프로젝트 최상단에서 `.env.local` 파일을 만들고 키를 넣습니다. `.env.local`은 저장소에 올리지 마세요.
+
+```env
+NEXT_PUBLIC_KAKAO_MAP_KEY=여기에_JavaScript_키
+```
+
+키를 추가하거나 바꾼 뒤에는 개발 서버를 다시 시작해야 합니다.
+
+## 개발 서버 실행
+
+Node.js 22 이상에서 다음을 실행합니다.
 
 ```bash
 npm install
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+터미널이 안내하는 주소(대개 `http://localhost:3000`)를 브라우저에서 여세요.
 
-## Included Shape
+## 지도 사용법
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
-
-The user ID is stable for the same user on the same Site and different across Sites. Email and name are intended for display or contact purposes.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
-```
-
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+- 추천 카드의 **시설 보기** 또는 하단 **지도** 메뉴를 누르면 추천 해수욕장 중심의 지도가 열립니다.
+- 상단 필터로 전체·음식점·카페·편의점·주차장·화장실을 선택합니다.
+- 마커를 누르면 주소, 전화번호, 해수욕장 기준 거리와 카카오맵 상세 링크를 확인할 수 있습니다.
+- `◎` 버튼은 위치 권한을 요청해 현재 위치를 표시합니다. 거부해도 나머지 기능은 정상 동작합니다.
