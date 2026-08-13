@@ -34,6 +34,7 @@ export default function Home() {
   const pick = selected || ranked[0];
   if (page === "map") return <KakaoMapView beachName={pick.name} onBack={() => setPage("home")} />;
   const doSearch = () => { setSelected(null); setSubmitted(true); };
+  const scrollToSection = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   return <main className="app-shell">
     <section className="hero">
       <div className="topline"><div className="brand"><span>🌊</span> 부산바다<b>ON</b></div><button className="bell" aria-label="알림">🔔</button></div>
@@ -46,18 +47,18 @@ export default function Home() {
 
     <section className="content">
       <div className="weather"><div><span className="sample">예시 데이터</span><b>부산 현재</b><strong>27°</strong><span>맑음 · 습도 72%</span></div><div className="sun">☀️</div></div>
-      {submitted && <><div className="section-title"><div><span>✨ AI 바다 추천</span><h2>오늘의 PICK</h2></div><span className="live">분석 완료</span></div>
+      {submitted && <div id="recommendation"><div className="section-title"><div><span>✨ AI 바다 추천</span><h2>오늘의 PICK</h2></div><span className="live">분석 완료</span></div>
       <article className="pick-card">
         <div className="ocean-art"><span>🌅</span><i>BUSAN</i></div><div className="pick-body"><div className="rank"><span>AI 추천도</span><b>{Math.min(96, pick.match)}%</b></div><h2>{pick.name}</h2><p>{pick.area} · 현재 혼잡도 <b className={pick.crowd === "높음" ? "red" : "green"}>{pick.crowd}</b></p><blockquote>“{pick.blurb}”</blockquote><div className="reason-tags">{pick.tags.slice(0,4).map(t => <span key={t}>{t}</span>)}</div><button className="detail" onClick={() => setPage("map")}>시설 보기 <b>→</b></button></div>
       </article>
       <div className="alternatives"><p>함께 살펴보세요</p>{ranked.slice(1,3).map((b, i) => <button key={b.name} onClick={() => setSelected(b)}><span className="place-num">0{i+2}</span><span><b>{b.name}</b><small>{b.crowd} · {b.activities.slice(0,2).join(" · ")}</small></span><strong>{Math.min(96,b.match)}%</strong></button>)}</div>
-      {pick.crowd === "높음" && <div className="crowd-alert"><span>⚠️</span><div><b>현재 {pick.name.replace("해수욕장", "")}는 혼잡해요</b><p>비슷한 분위기의 더 여유로운 바다를 함께 확인해보세요.</p></div></div>}</>}
+      {pick.crowd === "높음" && <div className="crowd-alert"><span>⚠️</span><div><b>현재 {pick.name.replace("해수욕장", "")}는 혼잡해요</b><p>비슷한 분위기의 더 여유로운 바다를 함께 확인해보세요.</p></div></div>}</div>}
 
       <section id="detail" className="detail-section"><div className="section-title"><div><span>🌊 {pick.name}</span><h2>오늘의 바다 상태</h2></div><span className="sample">예시 데이터</span></div><div className="stat-grid">{[["🌡️","기온",`${pick.temp}°C`],["🌊","수온",`${pick.water}°C`],["💨","바람",pick.wind],["〰️","파고",pick.wave],["👥","혼잡도",pick.crowd],["💧","습도","72%"]].map(x=><div key={x[1]}><span>{x[0]}</span><small>{x[1]}</small><b className={x[2] === "낮음" ? "green" : ""}>{x[2]}</b></div>)}</div><div className="index-card"><div><span>오늘의 바다 지수</span><h3>“바다를 즐기기 좋은 날이에요”</h3></div><div className="ratings">{[["물놀이",5],["산책",5],["사진",4],["서핑",2],["데이트",5]].map(([n,s]) => <div key={String(n)}><span>{n}</span><b>{"★".repeat(Number(s))}<i>{"★".repeat(5-Number(s))}</i></b></div>)}</div></div></section>
 
-      <section className="course"><div className="section-title"><div><span>✨ 부산바다ON 추천코스</span><h2>오늘의 AI 놀거리 코스</h2></div><span className="duration">약 5시간</span></div><p className="course-intro">입력하신 취향과 현재 상태를 반영했어요.</p><div className="timeline">{[["14:00","🌊",`${pick.name} 도착`,`해변 산책 후 자리 잡기`],["14:10","🏖️","시원한 물놀이","바다 상태가 잔잔해 안전하게 즐겨요"],["16:40","🦶","세족장 이용","가까운 시설에서 간단히 정리"],["17:00","🍴","근처 맛집 방문","부산의 맛을 담은 한 끼"],["18:20","📸","해변 산책 & 사진","햇살이 부드러워지는 시간"],["19:10","🌅","노을 감상","오늘 여행의 가장 빛나는 순간"]].map(x=><div className="timeline-item" key={String(x[0])}><time>{x[0]}</time><span className="dot">{x[1]}</span><div><b>{x[2]}</b><small>{x[3]}</small></div></div>)}</div></section>
+      <section id="ai-course" className="course"><div className="section-title"><div><span>✨ 부산바다ON 추천코스</span><h2>오늘의 AI 놀거리 코스</h2></div><span className="duration">약 5시간</span></div><p className="course-intro">입력하신 취향과 현재 상태를 반영했어요.</p><div className="timeline">{[["14:00","🌊",`${pick.name} 도착`,`해변 산책 후 자리 잡기`],["14:10","🏖️","시원한 물놀이","바다 상태가 잔잔해 안전하게 즐겨요"],["16:40","🦶","세족장 이용","가까운 시설에서 간단히 정리"],["17:00","🍴","근처 맛집 방문","부산의 맛을 담은 한 끼"],["18:20","📸","해변 산책 & 사진","햇살이 부드러워지는 시간"],["19:10","🌅","노을 감상","오늘 여행의 가장 빛나는 순간"]].map(x=><div className="timeline-item" key={String(x[0])}><time>{x[0]}</time><span className="dot">{x[1]}</span><div><b>{x[2]}</b><small>{x[3]}</small></div></div>)}</div></section>
       <section className="compare"><div className="section-title"><div><span>⚖️ 바다 비교</span><h2>어디로 갈지 고민된다면</h2></div></div><div className="compare-table"><div><b>구분</b><b>{ranked[0].name.replace("해수욕장","")}</b><b>{ranked[1].name.replace("해수욕장","")}</b><b>{ranked[2].name.replace("해수욕장","")}</b></div><div><span>혼잡도</span><span>{ranked[0].crowd}</span><span>{ranked[1].crowd}</span><span>{ranked[2].crowd}</span></div><div><span>물놀이</span><span>좋음</span><span>좋음</span><span>좋음</span></div><div><span>맛집</span><span>{restaurantLevel[ranked[0].name]}</span><span>{restaurantLevel[ranked[1].name]}</span><span>{restaurantLevel[ranked[2].name]}</span></div></div></section>
     </section>
-    <nav><button className="active">🏠<span>홈</span></button><button>🌊<span>바다</span></button><button onClick={() => setPage("map")}>🗺️<span>지도</span></button><button>✨<span>AI코스</span></button><button>👤<span>MY</span></button></nav>
+    <nav><button className="active">🏠<span>홈</span></button><button onClick={() => scrollToSection("recommendation")}>🌊<span>바다</span></button><button onClick={() => setPage("map")}>🗺️<span>지도</span></button><button onClick={() => scrollToSection("ai-course")}>✨<span>AI코스</span></button><button>👤<span>MY</span></button></nav>
   </main>;
 }
