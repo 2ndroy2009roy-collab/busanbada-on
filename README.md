@@ -37,9 +37,16 @@
 
 ```env
 NEXT_PUBLIC_KAKAO_MAP_KEY=여기에_JavaScript_키
+KMA_SERVICE_KEY=공공데이터포털에서_발급한_기상청_서비스키
 ```
 
 키를 추가하거나 바꾼 뒤에는 개발 서버를 다시 시작해야 합니다.
+
+### 기상청 초단기실황 API
+
+`GET /api/weather/current`은 서버에서만 `KMA_SERVICE_KEY`를 읽어 부산 격자점(`nx=98`, `ny=76`)의 초단기실황을 조회합니다. 공식 `getUltraSrtNcst` 응답에서 `category`가 `T1H`인 항목의 `obsrValue`만 `temperature`로 반환하므로 서비스 키나 기상청 원본 응답은 브라우저로 전달되지 않습니다.
+
+기상청 API 키는 공공데이터포털의 [기상청 단기예보 조회서비스](https://www.data.go.kr/data/15084084/openapi.do)에서 발급받으세요. GitHub Pages는 정적 호스팅이라 `/api/weather/current` 같은 서버 Route를 실행할 수 없으므로, Pages 배포에서는 예시 기온이 유지됩니다. 서버 런타임을 지원하는 배포 환경에서는 `KMA_SERVICE_KEY`를 배포 환경변수로 등록하면 실시간 기온이 표시됩니다.
 
 ## 개발 서버 실행
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import KakaoMapView from "./KakaoMapView";
 
 type Beach = { name: string; area: string; score: number; crowd: string; temp: number; water: number; wave: string; wind: string; tags: string[]; blurb: string; activities: string[] };
@@ -27,6 +27,7 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(true);
   const [selected, setSelected] = useState<Beach | null>(null);
   const [page, setPage] = useState<"home" | "map">("home");
+  const [currentTemperature, setCurrentTemperature] = useState<number | null>(null);
   const ranked = useMemo(() => {
     const wants = Object.entries(keywords).flatMap(([word, values]) => query.includes(word) ? values : []);
     return beaches.map((b) => ({ ...b, match: b.score + b.activities.filter((a) => wants.includes(a)).length * 7 - (wants.includes("한적") && b.crowd === "높음" ? 22 : 0) })).sort((a,b) => b.match - a.match);
@@ -35,6 +36,17 @@ export default function Home() {
   if (page === "map") return <KakaoMapView beachName={pick.name} onBack={() => setPage("home")} />;
   const doSearch = () => { setSelected(null); setSubmitted(true); };
   const scrollToSection = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/weather/current")
+      .then((response) => response.ok ? response.json() : null)
+      .then((data: { temperature?: number } | null) => {
+        if (active && typeof data?.temperature === "number") setCurrentTemperature(data.temperature);
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
   return <main className="app-shell">
     <section className="hero">
       <div className="topline"><div className="brand"><span>🌊</span> 부산바다<b>ON</b></div><button className="bell" aria-label="알림">🔔</button></div>
@@ -46,7 +58,7 @@ export default function Home() {
     </section>
 
     <section className="content">
-      <div className="weather"><div><span className="sample">예시 데이터</span><b>부산 현재</b><strong>27°</strong><span>맑음 · 습도 72%</span></div><div className="sun">☀️</div></div>
+      <div className="weather"><div><span className="sample">{currentTemperature === null ? "예시 데이터" : "기상청 초단기실황"}</span><b>부산 현재</b><strong>{currentTemperature ?? 27}°</strong><span>맑음 · 습도 72%</span></div><div className="sun">☀️</div></div>
       {submitted && <div id="recommendation"><div className="section-title"><div><span>✨ AI 바다 추천</span><h2>오늘의 PICK</h2></div><span className="live">분석 완료</span></div>
       <article className="pick-card">
         <div className="ocean-art"><span>🌅</span><i>BUSAN</i></div><div className="pick-body"><div className="rank"><span>AI 추천도</span><b>{Math.min(96, pick.match)}%</b></div><h2>{pick.name}</h2><p>{pick.area} · 현재 혼잡도 <b className={pick.crowd === "높음" ? "red" : "green"}>{pick.crowd}</b></p><blockquote>“{pick.blurb}”</blockquote><div className="reason-tags">{pick.tags.slice(0,4).map(t => <span key={t}>{t}</span>)}</div><button className="detail" onClick={() => setPage("map")}>시설 보기 <b>→</b></button></div>
